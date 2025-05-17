@@ -1,0 +1,30 @@
+
+/* src/components/ChatHistory.css */
+
+.chat-history-sidebar {
+  width: 250px;
+  background-color: #f1f1f1;
+  padding: 1rem;
+  border-right: 1px solid #ccc;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.history-date-group {
+  margin-bottom: 1rem;
+}
+
+.history-date-group ul {
+  list-style: none;
+  padding-left: 10px;
+}
+
+.history-date-group li {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.history-date-group li:hover {
+  background-color: #ddd;
+}
