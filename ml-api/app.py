@@ -6,9 +6,6 @@ from datetime import datetime
 import os
 import requests
 
-# OPENROUTER_API_KEY=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
-
-
 from utils.image_model import predict_image
 
 # Load environment variables
@@ -18,16 +15,22 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+allowed_origins = ["http://localhost:3000"]
+CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
+
 # Configure upload folder AFTER initializing the app
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
 
 # Load API key
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 if not OPENROUTER_API_KEY:
     raise ValueError("❌ Please set OPENROUTER_API_KEY in your .env file")
 
+print(f"OPENROUTER_API_KEY: {OPENROUTER_API_KEY}")
 # In-memory chat history
 chat_history = []
 
@@ -58,13 +61,13 @@ def post_history():
 # POST /chat
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
-    user_message = data.get("message")
-
-    if not user_message:
-        return jsonify({"error": "Missing 'message' in request body"}), 400
-
     try:
+        data = request.get_json()
+        if not data or "message" not in data:
+            return jsonify({"error": "Missing 'message' in request body"}), 400
+
+        user_message = data["message"]
+
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
@@ -79,16 +82,25 @@ def chat():
                 ]
             }
         )
+
+        if response.status_code != 200:
+            return jsonify({
+                "error": "Failed to get a valid response from OpenRouter",
+                "details": response.text
+            }), response.status_code
+
         data = response.json()
         reply = data.get("choices", [{}])[0].get("message", {}).get("content")
 
-        if reply:
-            return jsonify({"reply": reply})
-        else:
-            return jsonify({"error": "No response from assistant"}), 500
+        if not reply:
+            return jsonify({"error": "No response content from AI assistant"}), 500
+
+        return jsonify({"reply": reply})
+
     except Exception as e:
-        print("OpenRouter API Error:", str(e))
-        return jsonify({"error": "Failed to get response from AI assistant"}), 500
+        return jsonify({"error": "Exception occurred", "details": str(e)}), 500
+
+
 
 # POST /image
 @app.route("/image", methods=["POST"])
@@ -111,6 +123,5 @@ def image_recognition():
     except Exception as e:
         return jsonify({"error": f"Image processing failed: {str(e)}"}), 500
 
-
 if __name__ == "__main__":
-    app.run(debug=False, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+    app.run(debug=True, host='0.0.0.0', port=int(os.getenv("PORT", 5000)))
