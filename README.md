@@ -4,4 +4,4 @@ OPENROUTER_API_KEY=sk-or-v1-87e972aa708c26122373c7e10a8d3356007f2d085ee9622c03e6
 
 render=https://ai-nutrition-app-6.onrender.com
 
-vercel=https://ai-nutrition-app.vercel.app/
+vercel=https://ai-nutrition-apppp.vercel.app/
