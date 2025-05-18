@@ -41,7 +41,7 @@ function ChatBox() {
     formData.append("image", file);
 
     try {
-      const response = await fetch("http://localhost:5000/image", {
+      const response = await fetch("https://ai-nutrition-app-6.onrender.com/image", {
         method: "POST",
         body: formData,
       });
@@ -75,7 +75,7 @@ function ChatBox() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/history")
+      .get("https://ai-nutrition-app-6.onrender.com/api/history")
       .then((res) => {
         setChatHistory(res.data);
       })
@@ -134,7 +134,7 @@ const handleSubmit = async (e, text) => {
   setLoading(true);
 
   try {
-    const response = await axios.post("http://localhost:5000/chat", {
+    const response = await axios.post("https://ai-nutrition-app-7.onrender.com/chat", {
       message: userText,
     });
 
@@ -144,12 +144,12 @@ const handleSubmit = async (e, text) => {
     setReply(botReply);
     setSubmittedQuestion(userText);
 
-    await axios.post("http://localhost:5000/api/history", {
+    await axios.post("https://ai-nutrition-app-6.onrender.com/api/history", {
       question: userText,
       answer: botReply,
     });
 
-    const historyResponse = await axios.get("http://localhost:5000/api/history");
+    const historyResponse = await axios.get("https://ai-nutrition-app-6.onrender.com/api/history");
     setChatHistory(historyResponse.data);
   } catch (err) {
     setError("Error fetching reply from assistant.");
